@@ -12,4 +12,10 @@ router.get('/install', function(req, res) {
   })
 });
 
+router.get('/uninstall', function(req, res) {
+  insales.uninstall(req, function(del){
+    (del === '1') ? res.send(200, 'Приложение удалено') : res.send(500, 'Приложение не удалено');
+  })
+});
+
 module.exports = router;
