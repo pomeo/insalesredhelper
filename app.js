@@ -8,6 +8,7 @@ var stylus = require('stylus');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var insales = require('insales');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
