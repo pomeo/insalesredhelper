@@ -11,7 +11,6 @@ var bodyParser = require('body-parser');
 var insales = require('insales');
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
 
 var app = express();
 
@@ -46,7 +45,6 @@ app.use(insales({
 }));
 
 app.use('/', routes);
-app.use('/users', users);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
