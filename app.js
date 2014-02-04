@@ -37,8 +37,8 @@ app.use(stylus.middleware({
       }
   }));
 app.use(insales({
-  id: 'process.env.APPID',
-  secret: 'process.env.APPSECRET',
+  id: process.env.APPID,
+  secret: process.env.APPSECRET,
   mongodb: 'mongodb://mongodb.fr1.server.sovechkin.com/redhelper',
   kue: 'kue.fr1.server.sovechkin.com',
   usage: ''
