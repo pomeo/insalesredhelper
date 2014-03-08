@@ -8,7 +8,6 @@ var stylus = require('stylus');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var insales = require('insales');
 
 var routes = require('./routes/index');
 
@@ -36,13 +35,6 @@ app.use(stylus.middleware({
             .set('compress', true);
       }
   }));
-app.use(insales({
-  id: process.env.APPID,
-  secret: process.env.APPSECRET,
-  mongodb: 'mongodb://mongodb.fr1.server.sovechkin.com/redhelper',
-  kue: 'kue.fr1.server.sovechkin.com',
-  usage: ''
-}));
 
 app.use('/', routes);
 
