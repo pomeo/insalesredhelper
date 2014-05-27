@@ -15,5 +15,5 @@ set :supervisord_stop_group, "test"
 #========================
 set  :gateway,    "#{application}"   # main server
 role :app,        "ubuntu@10.3.42.3" # lxc container
- 
+
 after "deploy:create_symlink", "deploy:npm_install", "deploy:restart"
