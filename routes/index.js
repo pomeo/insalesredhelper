@@ -5,6 +5,10 @@ router.get('/', function(req, res) {
   res.render('index', { title: '' });
 });
 
+router.post('/', function(req, res) {
+  res.redirect('/');
+});
+
 // router.get('/js/install', function(req, res) {
 //   var xml = '(function() {'
 //           + 'var fileref = document.createElement(\"script\");'

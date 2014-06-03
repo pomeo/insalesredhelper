@@ -1,4 +1,21 @@
 extends layout
 
 block content
-  
+  div.uk-width-1-1.uk-height-1-1.uk-vertical-align.uk-text-center
+    div.b-login.uk-container-center.uk-vertical-align-middle
+      form.uk-form(action="/", method="post")
+        fieldset.uk-text-left(data-uk-margin)
+          div.uk-form-row
+            div.uk-form-icon
+              i.uk-icon-user
+              input.uk-form-width-medium(type="text", name="login", placeholder="Логин")
+          div.uk-form-row
+            div.uk-form-icon
+              i.uk-icon-envelope
+              input.uk-form-width-medium(type="text", name="email", placeholder="E-mail")
+          div.uk-form-row
+            div.uk-form-icon
+              i.uk-icon-lock
+              input.uk-form-width-medium(type="password", name="pass", placeholder="Пароль")
+          div.uk-form-row
+            button.uk-button.uk-margin-small-right Зарегистрироваться
