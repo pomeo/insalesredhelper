@@ -1,5 +1,7 @@
-var express = require('express');
-var router = express.Router();
+var express    = require('express'),
+    router     = express.Router(),
+    mongoose   = require('mongoose'),
+    Schema     = mongoose.Schema;
 
 router.get('/', function(req, res) {
   res.render('index', { title: '' });
