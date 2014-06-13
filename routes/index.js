@@ -1,6 +1,7 @@
 var express    = require('express'),
     router     = express.Router(),
     Q          = require('q'),
+    rest       = require('restler'),
     mongoose   = require('mongoose'),
     Schema     = mongoose.Schema;
 
