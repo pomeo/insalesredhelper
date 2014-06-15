@@ -2,6 +2,7 @@ var express    = require('express'),
     router     = express.Router(),
     Q          = require('q'),
     rest       = require('restler'),
+    crypto     = require('crypto'),
     mongoose   = require('mongoose'),
     moment     = require('moment'),
     Schema     = mongoose.Schema;
