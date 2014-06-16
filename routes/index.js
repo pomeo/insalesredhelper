@@ -11,8 +11,8 @@ router.get('/', function(req, res) {
   res.render('index', { title: '' });
 });
 
-router.post('/', function(req, res) {
-  res.redirect('/');
+router.get('/login', function(req, res) {
+  res.render('login', { title: '' });
 });
 
 
