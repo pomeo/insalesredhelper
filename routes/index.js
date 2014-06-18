@@ -19,6 +19,10 @@ router.post('/login', function(req, res) {
   res.send('200');
 });
 
+router.get('/registration', function(req, res) {
+  res.render('registration', { title: '' });
+});
+
 router.get('/install', function(req, res) {
   res.send(200);
 });
