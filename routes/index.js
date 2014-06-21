@@ -40,3 +40,5 @@ router.get('/uninstall', function(req, res) {
 });
 
 module.exports = router;
+
+mongoose.connect('mongodb://mongodb.fr1.server.sovechkin.com/redhelper');
