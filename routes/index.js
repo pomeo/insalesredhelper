@@ -54,4 +54,14 @@ UsersSchema.add({
   enabled     : Boolean
 });
 
+var LicensesSchema = new Schema();
+
+LicensesSchema.add({
+  guid        : { type: Number, index: true },
+  amount      : Number,
+  currency    : String,
+  quantity    : Number,
+  enabled     : Boolean
+});
+
 var Users = mongoose.model('Users', UsersSchema);
