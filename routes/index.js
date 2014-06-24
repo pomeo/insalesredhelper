@@ -64,4 +64,16 @@ LicensesSchema.add({
   enabled     : Boolean
 });
 
+var AppsSchema = new Schema();
+
+AppsSchema.add({
+  url         : { type: String, unique: true },
+  insalesid   : String,
+  password    : String,
+  created_at  : Date,
+  updated_at  : Date,
+  enabled     : Boolean
+});
+
 var Users = mongoose.model('Users', UsersSchema);
+var Apps = mongoose.model('Apps', AppsSchema);
