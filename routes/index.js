@@ -32,7 +32,44 @@ router.get('/dashboard', function(req, res) {
 });
 
 router.get('/install', function(req, res) {
-  res.send(200);
+  if ((req.param('shop') !== '') && (req.param('token') !== '') && (req.param('insales_id') !== '') && req.param('shop') && req.param('token') && req.param('insales_id')) {
+    Apps.findOne({insalesid:req.param('insales_id')}, function(err, a) {
+      if (a == null) {
+        var app = new Apps({
+          insalesid  : req.param('insales_id'),
+          url        : req.param('shop'),
+          password   : crypto.createHash('md5').update(req.param('token') + process.env.insalessecret).digest('hex'),
+          created_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
+          updated_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
+          enabled    : 1
+        });
+        app.save(function (err) {
+          if (err) {
+            res.send(err, 500);
+          } else {
+            res.send(200);
+          }
+        });
+      } else {
+        if (a.enabled == true) {
+          res.send('Приложение уже установленно', 403);
+        } else {
+          a.password = crypto.createHash('md5').update(req.param('token') + process.env.insalessecret).digest('hex');
+          a.updated_at = moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ');
+          a.enabled = 1;
+          a.save(function (err) {
+            if (err) {
+              res.send(err, 500);
+            } else {
+              res.send(200);
+            }
+          });
+        }
+      }
+    });
+  } else {
+    res.send('Ошибка установки приложения', 403);
+  }
 });
 
 router.get('/uninstall', function(req, res) {
