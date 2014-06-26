@@ -73,7 +73,25 @@ router.get('/install', function(req, res) {
 });
 
 router.get('/uninstall', function(req, res) {
-  res.send(200);
+  if ((req.param('shop') !== '') && (req.param('token') !== '') && (req.param('insales_id') !== '') && req.param('shop') && req.param('token') && req.param('insales_id')) {
+    Apps.findOne({insalesid:req.param('insales_id')}, function(err, a) {
+      if (a.password == req.param('token')) {
+        a.updated_at = moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ');
+        a.enabled = 0;
+        a.save(function (err) {
+          if (err) {
+            res.send(err, 500);
+          } else {
+            res.send(200);
+          }
+        });
+      } else {
+        res.send('Ошибка удаления приложения', 403);
+      }
+    });
+  } else {
+    res.send('Ошибка удаления приложения', 403);
+  }
 });
 
 module.exports = router;
