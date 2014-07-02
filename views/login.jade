@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  div.uk-width-1-1.uk-height-1-1.uk-vertical-align.uk-text-center
+    div.b-login.uk-container-center.uk-vertical-align-middle
+      img.uk-display-block.uk-align-center(src="/img/logo.png")
+      form.uk-form.uk-form-stacked(action="/login", method="post")
+        fieldset(data-uk-margin)
+          div.uk-form-row
+            div.uk-form-icon
+              i.uk-icon-user
+              input.uk-form-width-medium.b-login-input(type="text", name="login", placeholder="Логин")
+          div.uk-form-row
+            button.uk-button.uk-margin-small-right Установить онлайн-консультант RedHelper
+  div.b-support
+    p.uk-text-bold Отдел технической поддержки клиентов RedHelper
+    p.uk-margin-left +7 (495) 221-77-57, доб. 201<br />
+      a(href="mailto:info@redhelper.ru") Info@redhelper.ru<br />
+      | Чат онлайн на сайте: 
+      a(href="http://redhelper.ru") http://redhelper.ru
