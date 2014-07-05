@@ -16,7 +16,8 @@ router.get('/login', function(req, res) {
 });
 
 router.post('/login', function(req, res) {
-  res.send('200');
+  console.log(req.param('login'));
+  res.redirect('/success');
 });
 
 router.get('/registration', function(req, res) {
@@ -29,6 +30,10 @@ router.post('/registration', function(req, res) {
 
 router.get('/dashboard', function(req, res) {
   res.render('dashboard', { title: '' });
+});
+
+router.get('/success', function(req, res) {
+  res.render('success', { title: '' });
 });
 
 router.get('/install', function(req, res) {
