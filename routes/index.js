@@ -46,7 +46,7 @@ router.get('/install', function(req, res) {
           password   : crypto.createHash('md5').update(req.param('token') + process.env.insalessecret).digest('hex'),
           created_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
           updated_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
-          enabled    : 1
+          enabled    : true
         });
         app.save(function (err) {
           if (err) {
@@ -82,7 +82,7 @@ router.get('/uninstall', function(req, res) {
     Apps.findOne({insalesid:req.param('insales_id')}, function(err, a) {
       if (a.password == req.param('token')) {
         a.updated_at = moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ');
-        a.enabled = 0;
+        a.enabled = false;
         a.save(function (err) {
           if (err) {
             res.send(err, 500);
