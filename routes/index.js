@@ -107,7 +107,6 @@ var UsersSchema = new Schema();
 
 UsersSchema.add({
   login       : { type: String, unique: true },
-  email       : { type: String, lowercase: true },
   licenses    : [LicensesSchema],
   created_at  : Date,
   updated_at  : Date,
