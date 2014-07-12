@@ -25,7 +25,7 @@ router.get('/registration', function(req, res) {
 });
 
 router.post('/registration', function(req, res) {
-  res.send('200');
+  res.redirect('/success');
 });
 
 router.get('/dashboard', function(req, res) {
