@@ -1,0 +1,42 @@
+extends layout
+
+block content
+  div.uk-width-1-1.uk-height-1-1.uk-vertical-align.uk-text-center
+    div.b-login.uk-container-center.uk-vertical-align-middle
+      img.uk-display-block.uk-align-center.uk-margin-large-top(src="/img/logo.png")
+      form.uk-form.uk-form-stacked(action="/registration", method="post")
+        fieldset.uk-text-left(data-uk-margin)
+          div.uk-form-row.b-reg-input
+            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small(for="") Придумайте свой уникальный логин. Логин может состоять только из латинских букв и цифр, сам логин должен быть не короче 3 символов
+            div.uk-form-icon
+              i.uk-icon-user
+              input.uk-form-width-medium(type="text", name="login", placeholder="Логин*")
+          div.uk-form-row.b-reg-input
+            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small(for="") Введите адрес электронной почты, который будет использоваться для связи с Вами
+            div.uk-form-icon
+              i.uk-icon-envelope
+              input.uk-form-width-medium(type="text", name="email", placeholder="E-mail*")
+          div.uk-form-row.b-reg-input
+            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small(for="") Придумайте пароль для подключения сервиса RedHelper. В целях безопасности пароль должен отличаться от пароля InSales
+            div.uk-form-icon
+              i.uk-icon-lock
+              input.uk-form-width-medium(type="password", name="pass", placeholder="Пароль*")
+          div.uk-form-row.b-reg-input
+            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small(for="") Введите Ваше ФИО по-русски
+            div.uk-form-icon
+              i.uk-icon-lock
+              input.uk-form-width-medium(type="text", name="name", placeholder="Имя*")
+          div.uk-form-row.b-reg-input
+            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small(for="") Ваш контактный телефон
+            div.uk-form-icon
+              i.uk-icon-lock
+              input.uk-form-width-medium(type="text", name="phone", placeholder="Телефон*")
+          div.uk-form-row
+            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small(for="") * - поля обязательные для заполнения
+            button.uk-button.uk-margin-small-right Зарегистрироваться
+  div.b-support
+    p.uk-text-bold Отдел технической поддержки клиентов RedHelper
+    p.uk-margin-left +7 (495) 221-77-57, доб. 201<br />
+      a(href="mailto:info@redhelper.ru") Info@redhelper.ru<br />
+      | Чат онлайн на сайте: 
+      a(href="http://redhelper.ru") http://redhelper.ru
