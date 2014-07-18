@@ -44,7 +44,7 @@ router.get('/', function(req, res) {
               if (err) {
                 res.send(err, 500);
               } else {
-                res.redirect('http://' + a.url + '/admin/applications/' + process.env.insalesid + '/login?token=' + id + '&login=http://localhost:3000');
+                res.redirect('http://' + a.url + '/admin/applications/' + process.env.insalesid + '/login?token=' + id + '&login=http://test3.sovechkin.com');
               }
             });
           }
