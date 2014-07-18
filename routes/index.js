@@ -10,7 +10,52 @@ var express    = require('express'),
     hat        = require('hat');
 
 router.get('/', function(req, res) {
-  res.render('index', { title: '' });
+  if (req.query.token && (req.query.token !== '')) {
+    Apps.findOne({token:req.query.token}, function(err, a) {
+      if (a) {
+        req.session.insalesid = a.insalesid;
+        res.redirect('/?insales_id=' + req.session.insalesid);
+      } else {
+        res.send('Ошибка автологина', 403);
+      }
+    });
+  } else {
+    console.log('Попытка входа магазина: ' + req.query.insales_id);
+    if (req.query.insales_id && (req.query.insales_id !== '')) {
+      Apps.findOne({insalesid:req.query.insales_id}, function(err, a) {
+        if (a.enabled == true) {
+          if (req.session.insalesid) {
+            if (a.install == true) {
+              Users.findOne({insalesid:req.query.insales_id}, function(err, u) {
+                if (u) {
+                  res.render('licenses', { title: '' });
+                } else {
+                  res.render('success', { title: '' });
+                }
+              });
+            } else {
+              res.render('index', { title: '' });
+            }
+          } else {
+            console.log('авторизация');
+            var id = hat();
+            a.token = crypto.createHash('md5').update(id + a.password).digest('hex');
+            a.save(function (err) {
+              if (err) {
+                res.send(err, 500);
+              } else {
+                res.redirect('http://' + a.url + '/admin/applications/' + process.env.insalesid + '/login?token=' + id + '&login=http://localhost:3000');
+              }
+            });
+          }
+        } else {
+          res.send('Приложение не установлено для данного магазина', 403);
+        }
+      });
+    } else {
+      res.send('Вход возможен только из панели администратора insales -> приложения -> установленные -> войти', 403);
+    }
+  }
 });
 
 router.get('/login', function(req, res) {
