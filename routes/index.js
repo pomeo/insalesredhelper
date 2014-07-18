@@ -59,7 +59,11 @@ router.get('/', function(req, res) {
 });
 
 router.get('/login', function(req, res) {
-  res.render('login', { title: '' });
+  if (req.session.insalesid) {
+    res.render('login', { title: '' });
+  } else {
+    res.send('Вход возможен только из панели администратора insales -> приложения -> установленные -> войти', 403);
+  }
 });
 
 router.post('/login', function(req, res) {
