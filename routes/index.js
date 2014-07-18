@@ -111,7 +111,7 @@ var UsersSchema = new Schema();
 UsersSchema.add({
   login       : { type: String, unique: true },
   licenses    : [LicensesSchema],
-  installed   : Boolean,
+  insalesid   : Number,
   created_at  : Date,
   updated_at  : Date,
   enabled     : Boolean
