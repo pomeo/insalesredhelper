@@ -67,8 +67,44 @@ router.get('/login', function(req, res) {
 });
 
 router.post('/login', function(req, res) {
-  console.log(req.param('login'));
-  res.redirect('/success');
+  if (req.session.insalesid) {
+    Apps.findOne({insalesid:req.session.insalesid}, function(err, a) {
+      var xml = '(function() {'
+              + 'var fileref = document.createElement(\"script\");'
+              + 'fileref.setAttribute(\"type\",\"text/javascript\");'
+              + 'fileref.id = \'rhlpscrtg\';'
+              + 'fileref.charset=\'utf-8\';'
+              + 'fileref.async = true;'
+              + 'fileref.setAttribute(\"src\", \"https://web.redhelper.ru/service/main.js?c=' + req.param('login').toLowerCase() + '\");'
+              + 'document.getElementsByTagName(\"head\")[0].appendChild(fileref);'
+              + '})();';
+      var jstag = '<js-tag>'
+                + '<type type="string">JsTag::TextTag</type>'
+                + '<content>' + xml + '</content>'
+                + '</js-tag>';
+      rest.post('http://' + process.env.insalesid + ':' + a.password + '@' + a.url + '/admin/js_tags.xml', {
+        data: jstag,
+        headers: {'Content-Type': 'application/xml'}
+      }).once('complete', function(o) {
+        if (o.errors) {
+          console.log('Error: ' + JSON.stringify(o));
+          res.send('Произошла ошибка установки js кода', 500);
+        } else {
+          console.log(o);
+          a.install = true;
+          a.save(function (err) {
+            if (err) {
+              res.send(err, 500);
+            } else {
+              res.redirect('/success');
+            }
+          });
+        }
+      });
+    });
+  } else {
+    res.send('Вход возможен только из панели администратора insales -> приложения -> установленные -> войти', 403);
+  }
 });
 
 router.get('/registration', function(req, res) {
