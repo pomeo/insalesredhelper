@@ -39,13 +39,13 @@ router.get('/success', function(req, res) {
 });
 
 router.get('/install', function(req, res) {
-  if ((req.param('shop') !== '') && (req.param('token') !== '') && (req.param('insales_id') !== '') && req.param('shop') && req.param('token') && req.param('insales_id')) {
-    Apps.findOne({insalesid:req.param('insales_id')}, function(err, a) {
+  if ((req.query.shop !== '') && (req.query.token !== '') && (req.query.insales_id !== '') && req.query.shop && req.query.token && req.query.insales_id) {
+    Apps.findOne({insalesid:req.query.insales_id}, function(err, a) {
       if (a == null) {
         var app = new Apps({
-          insalesid  : req.param('insales_id'),
-          url        : req.param('shop'),
-          password   : crypto.createHash('md5').update(req.param('token') + process.env.insalessecret).digest('hex'),
+          insalesid  : req.query.insales_id,
+          url        : req.query.shop,
+          password   : crypto.createHash('md5').update(req.query.token + process.env.insalessecret).digest('hex'),
           created_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
           updated_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
           enabled    : true
@@ -61,9 +61,9 @@ router.get('/install', function(req, res) {
         if (a.enabled == true) {
           res.send('Приложение уже установленно', 403);
         } else {
-          a.password = crypto.createHash('md5').update(req.param('token') + process.env.insalessecret).digest('hex');
+          a.password = crypto.createHash('md5').update(req.query.token + process.env.insalessecret).digest('hex');
           a.updated_at = moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ');
-          a.enabled = 1;
+          a.enabled = true;
           a.save(function (err) {
             if (err) {
               res.send(err, 500);
@@ -80,10 +80,11 @@ router.get('/install', function(req, res) {
 });
 
 router.get('/uninstall', function(req, res) {
-  if ((req.param('shop') !== '') && (req.param('token') !== '') && (req.param('insales_id') !== '') && req.param('shop') && req.param('token') && req.param('insales_id')) {
-    Apps.findOne({insalesid:req.param('insales_id')}, function(err, a) {
-      if (a.password == req.param('token')) {
+  if ((req.query.shop !== '') && (req.query.token !== '') && (req.query.insales_id !== '') && req.query.shop && req.query.token && req.query.insales_id) {
+    Apps.findOne({insalesid:req.query.insales_id}, function(err, a) {
+      if (a.password == req.query.token) {
         a.updated_at = moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ');
+        a.install = false;
         a.enabled = false;
         a.save(function (err) {
           if (err) {
