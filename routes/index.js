@@ -5,7 +5,8 @@ var express    = require('express'),
     crypto     = require('crypto'),
     mongoose   = require('mongoose'),
     moment     = require('moment'),
-    Schema     = mongoose.Schema;
+    Schema     = mongoose.Schema,
+    hat        = require('hat');
 
 router.get('/', function(req, res) {
   res.render('index', { title: '' });
