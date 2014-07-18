@@ -131,10 +131,12 @@ var AppsSchema = new Schema();
 
 AppsSchema.add({
   url         : { type: String, unique: true },
-  insalesid   : String,
+  insalesid   : Number,
   password    : String,
+  token       : String,
   created_at  : Date,
   updated_at  : Date,
+  install     : Boolean,
   enabled     : Boolean
 });
 
