@@ -28,7 +28,7 @@ router.get('/', function(req, res) {
             if (a.install == true) {
               Users.findOne({insalesid:req.query.insales_id}, function(err, u) {
                 if (u) {
-                  res.render('licenses', { title: '' });
+                  res.render('dashboard', { title: '' });
                 } else {
                   res.render('success', { title: '' });
                 }
@@ -113,10 +113,6 @@ router.get('/registration', function(req, res) {
 
 router.post('/registration', function(req, res) {
   res.redirect('/success');
-});
-
-router.get('/dashboard', function(req, res) {
-  res.render('dashboard', { title: '' });
 });
 
 router.get('/success', function(req, res) {
