@@ -108,15 +108,27 @@ router.post('/login', function(req, res) {
 });
 
 router.get('/registration', function(req, res) {
-  res.render('registration', { title: '' });
+  if (req.session.insalesid) {
+    res.render('registration', { title: '' });
+  } else {
+    res.send('Вход возможен только из панели администратора insales -> приложения -> установленные -> войти', 403);
+  }
 });
 
 router.post('/registration', function(req, res) {
-  res.redirect('/success');
+  if (req.session.insalesid) {
+    res.redirect('/success');
+  } else {
+    res.send('Вход возможен только из панели администратора insales -> приложения -> установленные -> войти', 403);
+  }
 });
 
 router.get('/success', function(req, res) {
-  res.render('success', { title: '' });
+  if (req.session.insalesid) {
+    res.render('success', { title: '' });
+  } else {
+    res.send('Вход возможен только из панели администратора insales -> приложения -> установленные -> войти', 403);
+  }
 });
 
 router.get('/install', function(req, res) {
