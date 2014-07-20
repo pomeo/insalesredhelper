@@ -3,37 +3,105 @@ extends layout
 block content
   div.uk-width-1-1.uk-height-1-1.uk-vertical-align.uk-text-center
     div.b-login.uk-container-center.uk-vertical-align-middle
-      img.uk-display-block.uk-align-center.uk-margin-large-top(src="/img/logo.png")
-      form.uk-form.uk-form-stacked(action="/registration", method="post")
+      img.uk-display-block.uk-align-center(src="/img/logo.png")
+      form.uk-form.uk-form-stacked(action="/registration", method="post", id="reg")
         fieldset.uk-text-left(data-uk-margin)
           div.uk-form-row.b-reg-input
-            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small(for="") Придумайте свой уникальный логин. Логин может состоять только из латинских букв и цифр, сам логин должен быть не короче 3 символов
-            div.uk-form-icon
+            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small.uk-margin-bottom-remove(for="login") Придумайте свой уникальный логин. Логин может состоять только из латинских букв и цифр, сам логин должен быть не короче 3 символов
+            div.uk-form-icon(id="flogin")
               i.uk-icon-user
               input.uk-form-width-medium(type="text", name="login", placeholder="Логин*")
-          div.uk-form-row.b-reg-input
-            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small(for="") Введите адрес электронной почты, который будет использоваться для связи с Вами
-            div.uk-form-icon
+          div.uk-form-row.b-reg-input.uk-margin-top-remove
+            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small.uk-margin-bottom-remove(for="email") Введите адрес электронной почты, который будет использоваться для связи с Вами
+            div.uk-form-icon(id="femail")
               i.uk-icon-envelope
               input.uk-form-width-medium(type="text", name="email", placeholder="E-mail*")
-          div.uk-form-row.b-reg-input
-            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small(for="") Придумайте пароль для подключения сервиса RedHelper. В целях безопасности пароль должен отличаться от пароля InSales
+          div.uk-form-row.b-reg-input.uk-margin-top-remove
+            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small.uk-margin-bottom-remove(for="pass") Придумайте пароль для подключения сервиса RedHelper. В целях безопасности пароль должен отличаться от пароля InSales
             div.uk-form-icon
               i.uk-icon-lock
               input.uk-form-width-medium(type="password", name="pass", placeholder="Пароль*")
-          div.uk-form-row.b-reg-input
-            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small(for="") Введите Ваше ФИО по-русски
+          div.uk-form-row.b-reg-input.uk-margin-top-remove
+            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small.uk-margin-bottom-remove(for="name") Введите Ваше ФИО по-русски
             div.uk-form-icon
               i.uk-icon-user
               input.uk-form-width-medium(type="text", name="name", placeholder="Имя*")
-          div.uk-form-row.b-reg-input
-            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small(for="") Ваш контактный телефон
+          div.uk-form-row.b-reg-input.uk-margin-top-remove
+            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small.uk-margin-bottom-remove(for="phone") Ваш контактный телефон
             div.uk-form-icon
               i.uk-icon-phone
               input.uk-form-width-medium(type="text", name="phone", placeholder="Телефон*")
-          div.uk-form-row
-            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small(for="") * - поля обязательные для заполнения
+          div.uk-form-row.uk-margin-top-remove
+            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small.uk-margin-bottom-remove(for="submit") * - поля обязательные для заполнения
             button.uk-button.uk-margin-small-right Зарегистрироваться
+      script
+        | $.validator.addMethod("loginRegex", function(value, element) {
+        |   return this.optional(element) || /^[a-zA-Z0-9]+$/i.test(value);
+        | }, "Только латинские буквы и цифры");
+        | $("#reg").validate({
+        |   errorClass: "uk-form-danger",
+        |   validClass: "uk-form-success",
+        |   rules: {
+        |     login: {
+        |       required: true,
+        |       minlength: 3,
+        |       loginRegex: true
+        |     },
+        |     email: {
+        |       required: true,
+        |       email: true
+        |     },
+        |     pass: {
+        |       required: true
+        |     },
+        |     name: {
+        |       required: true
+        |     },
+        |     phone: {
+        |       required: true,
+        |       number: true
+        |     }
+        |   },
+        |   messages: {
+        |     login: {
+        |       required: "",
+        |       minlength: "Логин должен быть не короче 3 символов"
+        |     },
+        |     email: {
+        |       required: "",
+        |       email: "Введите правильный e-mail"
+        |     },
+        |     pass: {
+        |       required: ""
+        |     },
+        |     name: {
+        |       required: ""
+        |     },
+        |     phone: {
+        |       required: "",
+        |       number: "Только цифры"
+        |     }
+        |   },
+        |   errorPlacement: function (error, element) {
+        |     error.insertAfter(element.parent());
+        |   },
+        |   submitHandler: function(form) {
+        |     $(form).ajaxSubmit({
+        |       success: function (response) {
+        |         if (response == 'exist') {
+        |           $("<label id=\"login-error\" class=\"uk-form-danger uk-text-italics\" for=\"login\" style=\"display: inline;\">Внимание! Выбранный Вами логин уже занят. Подберите другое имя.</label>").insertAfter('#flogin').next('div');
+        |         } else if (response == 'email incorrect') {
+        |           $("<label id=\"login-error\" class=\"uk-form-danger uk-text-italics\" for=\"login\" style=\"display: inline;\">Указанной Вами почты не существует. Исправьте адрес электронной почты и попробуйте еще раз.</label>").insertAfter('#femail').next('div');
+        |         } else if (response == 'success') {
+        |           window.location.href = "/dashboard";
+        |         } else {
+        |           $("<div class=\"uk-alert uk-alert-danger\" data-uk-alert><a class=\"uk-alert-close uk-close\" href=\"\"></a><p>Произошла ошибка</p></div>").insertBefore('#reg');
+        |         }
+        |       }
+        |     });
+        |     return false;
+        |   }
+        | })
   div.b-support
     p.uk-text-bold Отдел технической поддержки клиентов RedHelper
     p.uk-margin-left +7 (495) 221-77-57, доб. 201<br />
