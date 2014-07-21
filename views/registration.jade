@@ -93,7 +93,7 @@ block content
         |         } else if (response == 'email incorrect') {
         |           $("<label id=\"login-error\" class=\"uk-form-danger uk-text-italics\" for=\"login\" style=\"display: inline;\">Указанной Вами почты не существует. Исправьте адрес электронной почты и попробуйте еще раз.</label>").insertAfter('#femail').next('div');
         |         } else if (response == 'success') {
-        |           window.location.href = "/dashboard";
+        |           window.location.href = "/";
         |         } else {
         |           $("<div class=\"uk-alert uk-alert-danger\" data-uk-alert><a class=\"uk-alert-close uk-close\" href=\"\"></a><p>Произошла ошибка</p></div>").insertBefore('#reg');
         |         }
