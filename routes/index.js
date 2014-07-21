@@ -28,6 +28,8 @@ router.get('/', function(req, res) {
             if (a.install == true) {
               Users.findOne({insalesid:req.query.insales_id}, function(err, u) {
                 if (u) {
+                  console.log(u);
+                  req.session.user = u.login;
                   res.render('dashboard', { title: '' });
                 } else {
                   res.render('success', { title: '' });
@@ -117,7 +119,30 @@ router.get('/registration', function(req, res) {
 
 router.post('/registration', function(req, res) {
   if (req.session.insalesid) {
-    res.redirect('/success');
+    rest.get('http://my.redhelper.ru/mercury/api/client/register?key=' + process.env.redkey + '&name=' + req.param('login') + '&password=' + req.param('pass') + '&email=' + req.param('email') + '&contactfio=' + req.param('name') + '&contactphone=' + req.param('phone') + '&comment=distributor=InSales').once('complete', function(response) {
+      console.log(JSON.stringify(response));
+      if (response.error) {
+        res.send(response.error);
+      } else if (response.success) {
+        var user = new Users({
+          login      : req.param('login').toLowerCase(),
+          insalesid  : req.session.insalesid,
+          created_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
+          updated_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
+          enabled    : true
+        });
+        user.save(function (err) {
+          if (err) {
+            res.send(err, 500);
+          } else {
+            req.session.user = req.param('login').toLowerCase();
+            res.send(response.success);
+          }
+        });
+      } else {
+        res.send('error');
+      }
+    })
   } else {
     res.send('Вход возможен только из панели администратора insales -> приложения -> установленные -> войти', 403);
   }
