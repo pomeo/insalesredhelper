@@ -14,15 +14,16 @@ router.get('/', function(req, res) {
     Apps.findOne({token:req.query.token}, function(err, a) {
       if (a) {
         req.session.insalesid = a.insalesid;
-        res.redirect('/?insales_id=' + req.session.insalesid);
+        res.redirect('/');
       } else {
         res.send('Ошибка автологина', 403);
       }
     });
   } else {
     console.log('Попытка входа магазина: ' + req.query.insales_id);
-    if (req.query.insales_id && (req.query.insales_id !== '')) {
-      Apps.findOne({insalesid:req.query.insales_id}, function(err, a) {
+    if ((req.query.insales_id && (req.query.insales_id !== '')) || req.session.insalesid) {
+      var insid = req.session.insalesid || req.query.insales_id;
+      Apps.findOne({insalesid:insid}, function(err, a) {
         if (a.enabled == true) {
           if (req.session.insalesid) {
             if (a.install == true) {
