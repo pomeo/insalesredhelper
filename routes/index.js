@@ -27,7 +27,7 @@ router.get('/', function(req, res) {
         if (a.enabled == true) {
           if (req.session.insalesid) {
             if (a.install == true) {
-              Users.findOne({insalesid:req.query.insales_id}, function(err, u) {
+              Users.findOne({insalesid:insid}, function(err, u) {
                 if (u) {
                   console.log(u);
                   req.session.user = u.login;
