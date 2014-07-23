@@ -7,7 +7,32 @@ block content
       p Поздравляем. Вы установили онлайн-консультант RedHelper на свой сайт!
       p Теперь Вам необходимо установить приложение для оператора и настроить поведение системы в своём личном кабинете 
         a(href="http://redhelper.ru/my/login") Redhelper
-      h3 1. Установка приложения
+      h3 1. Приобрести лицензию
+      form.uk-form.uk-form-stacked(id="licen", method="post", action="/licenses")
+        fieldset(data-uk-margin)
+          div.uk-button.uk-form-select(data-uk-form-select)
+            i.uk-icon-calendar.uk-margin-small-right
+            span
+            i.uk-icon-caret-down.uk-margin-small-left
+            select(id="b-form-month", name="months")
+              option(value="1", selected) 1 месяц
+              option(value="3") 3 месяца
+              option(value="6") 6 месяцев
+              option(value="12") 12 месяцев
+              option(value="24") 24 месяца
+          span.uk-margin-left.uk-margin-right &times;
+          div.uk-form-icon
+            i.uk-icon-user
+            input.b-form-op(type="number", min="1", max="100", value="1", name="operators", id="b-form-operators")
+          span.uk-margin-small-left операторов
+          span.uk-margin-left.uk-margin-right &#61;
+          div.b-sum
+            span.b-total 960
+            i.uk-icon-rub
+          div.uk-form-row
+            button.uk-button Выставить счёт
+      script(src='/js/lic.js')
+      h3 2. Установка приложения
       p Вам необходимо скачать и установить приложение оператора. Приложение оператора позволяет наблюдать за посетителями, отвечать на их вопросы и многое другое. Приложение под Windows или Mac OS вы можете скачать по ссылкам ниже. Для других операционных систем и мобильных устройств вы можете использовать любой jabber клиент (
         a(href="https://redhelper.zendesk.com/forums/21556502-jabber-redhelper") как это сделать?)
       p Выберете тип операционной системы, скачайте и установите приложение
@@ -15,10 +40,10 @@ block content
         a.uk-display-inline-block.b-button-win.uk-margin-right(href="http://update.redhelper.ru/RedHelperSetup.ru-RU.exe") Скачать для Windows
         a.uk-display-inline-block.b-button-mac(href="http://update.redhelper.ru/RedHelper.dmg") Скачать для MAC OS
       p После установки используйте логин и пароль, выбранный при регистрации, для входа в приложение. Для завершения установки, попробуйте пообщаться через приложение. Для этого зайдите на сайт (обновите страницу), нажмите на значок "Задать вопрос" и напишите пару фраз в открывшемся окне. Сообщения придут в приложение оператора.
-      h3 2. Настройка системы
+      h3 3. Настройка системы
       p Всё готово для использования RedHelper на вашем сайте, но для максимальной эффективности работы системы необходимо произвести настройку внешнего вида и поведения RedHelper для вашего сайта.
       p.uk-container-center.b-success-button
-        a.uk-button.uk-text-italics(href="http://redhelper.ru/my/login") Перейти в Личный кабинет RedHelper
+        a.uk-button.uk-text-italics.b-button-private(href="http://redhelper.ru/my/login") Перейти в Личный кабинет RedHelper
       p Если Вам требуется помощь, напишите или позвоните нам
       p.uk-text-bold Отдел технической поддержки клиентов RedHelper.
       p +7 (495) 221-77-57, (доб. 201)
