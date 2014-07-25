@@ -27,13 +27,19 @@ router.get('/', function(req, res) {
         if (a.enabled == true) {
           if (req.session.insalesid) {
             if (a.install == true) {
-              Users.findOne({insalesid:insid}, function(err, u) {
+              Users.findOne({insalesid:insid}, {}, {sort: {'updated_at':-1}}, function(err, u) {
                 if (u) {
                   console.log(u);
                   req.session.user = u.login;
                   res.render('dashboard', { title: '' });
                 } else {
-                  res.render('success', { title: '' });
+                  req.session.destroy(function() {
+                    console.log(req.session.user);
+                    console.log('Пользователь отсутствует');
+                    res.clearCookie('user', { path: '/' });
+                    res.clearCookie('insalesid', { path: '/' });
+                    res.send('Пользователь отсутствует', 403);
+                  });
                 }
               });
             } else {
