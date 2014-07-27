@@ -93,74 +93,36 @@ router.get('/registration', function(req, res) {
 
 router.post('/registration', function(req, res) {
   if (req.session.insalesid) {
-    rest.get('http://my.redhelper.ru/mercury/api/client/register?key=' + process.env.redkey + '&name=' + req.param('login') + '&password=' + req.param('pass') + '&email=' + req.param('email') + '&contactfio=' + req.param('name') + '&contactphone=' + req.param('phone') + '&comment=distributor=InSales').once('complete', function(response) {
-      console.log(JSON.stringify(response));
-      if (response.error) {
-        res.send(response.error);
-      } else if (response.success) {
-        var user = new Users({
-          login      : req.param('login').toLowerCase(),
-          insalesid  : req.session.insalesid,
-          created_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
-          updated_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
-          enabled    : true
-        });
-        user.save(function (err) {
-          if (err) {
-            res.send(err, 500);
-          } else {
-            Apps.findOne({insalesid:req.session.insalesid}, function(err, a) {
-              var xml = '(function() {'
-                      + 'var fileref = document.createElement(\"script\");'
-                      + 'fileref.setAttribute(\"type\",\"text/javascript\");'
-                      + 'fileref.id = \'rhlpscrtg\';'
-                      + 'fileref.charset=\'utf-8\';'
-                      + 'fileref.async = true;'
-                      + 'fileref.setAttribute(\"src\", \"https://web.redhelper.ru/service/main.js?c=' + req.param('login').toLowerCase() + '\");'
-                      + 'document.getElementsByTagName(\"head\")[0].appendChild(fileref);'
-                      + '})();';
-              var jstag = '<js-tag>'
-                        + '<type type="string">JsTag::TextTag</type>'
-                        + '<content>' + xml + '</content>'
-                        + '</js-tag>';
-              rest.post('http://' + process.env.insalesid + ':' + a.password + '@' + a.url + '/admin/js_tags.xml', {
-                data: jstag,
-                headers: {'Content-Type': 'application/xml'}
-              }).once('complete', function(o) {
-                if (o.errors) {
-                  console.log('Error: ' + JSON.stringify(o));
-                  res.send('Произошла ошибка установки js кода', 500);
-                } else {
-                  console.log(o);
-                  a.install = true;
-                  a.save(function (err) {
-                    if (err) {
-                      res.send(err, 500);
-                    } else {
-                      req.session.user = req.param('login').toLowerCase();
-                      res.send(response.success);
-                    }
-                  });
-                }
-              });
-            });
-          }
-        });
-      } else {
-        res.send('error');
-      }
-    })
+    addJSTag(req, res);
   } else {
     res.send('Вход возможен только из панели администратора insales -> приложения -> установленные -> войти', 403);
   }
 });
 
-router.get('/success', function(req, res) {
-  if (req.session.insalesid) {
-    res.render('success', { title: '' });
-  } else {
-    res.send('Вход возможен только из панели администратора insales -> приложения -> установленные -> войти', 403);
+router.post('/licenses', function(req, res) {
+  if (req.session.user) {
+    Apps.findOne({insalesid:req.session.insalesid}, function(err, a) {
+      var invoice = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>'
+                  + '<application-charge>'
+                  + '<name>' +  + '</name>'
+                  + '<price type=\"decimal\">' +  + '</price>'
+                  + '<test type=\"boolean\">true</test>'
+                  + '<return-url>http://test3.sovechkin.com/check/12345</return-url>'
+                  + '</application-charge>';
+      rest.post('http://' + process.env.insalesid + ':' + a.password + '@' + a.url + '/admin/application_charges.xml', {
+        data: invoice,
+        headers: {'Content-Type': 'application/xml'}
+      }).once('complete', function(o) {
+        console.log(o);
+        res.send(200);
+      });
+    });
   }
+});
+
+router.get('/check/:invoiceid', function(req, res) {
+  req.param('invoiceid');
+  res.send(200);
 });
 
 router.get('/install', function(req, res) {
