@@ -10,7 +10,9 @@ $(document).ready(function() {
       }
     }
   });
-  $("#licen").ajaxForm(function() {
-    
+  $("#licen").ajaxForm({
+    success: function (response) {
+      window.location.replace(response);
+    }
   });
 });
