@@ -7,7 +7,8 @@ var express    = require('express'),
     mongoose   = require('mongoose'),
     moment     = require('moment'),
     Schema     = mongoose.Schema,
-    hat        = require('hat');
+    hat        = require('hat'),
+    async      = require('async');
 
 router.get('/', function(req, res) {
   if (req.query.token && (req.query.token !== '')) {
