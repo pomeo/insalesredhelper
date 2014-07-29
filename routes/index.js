@@ -443,6 +443,22 @@ function addJSTag(req, res) {
 
 mongoose.connect('mongodb://mongodb.fr1.server.sovechkin.com/redhelper');
 
+var LicensesSchema = new Schema();
+
+LicensesSchema.add({
+  guid        : { type: String, index: true },
+  insalesid   : { type: String, index: true },
+  myid        : { type: String, index: true },
+  amount      : Number,
+  start       : Date,
+  operators   : Number,
+  months      : Number,
+  status      : String,
+  created_at  : Date,
+  updated_at  : Date,
+  enabled     : Boolean
+});
+
 var UsersSchema = new Schema();
 
 UsersSchema.add({
@@ -451,16 +467,6 @@ UsersSchema.add({
   insalesid   : Number,
   created_at  : Date,
   updated_at  : Date,
-  enabled     : Boolean
-});
-
-var LicensesSchema = new Schema();
-
-LicensesSchema.add({
-  guid        : { type: Number, index: true },
-  amount      : Number,
-  currency    : String,
-  quantity    : Number,
   enabled     : Boolean
 });
 
