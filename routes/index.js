@@ -8,7 +8,14 @@ var express    = require('express'),
     moment     = require('moment'),
     Schema     = mongoose.Schema,
     hat        = require('hat'),
-    async      = require('async');
+    async      = require('async'),
+    status     = {};
+
+status = {
+  'accepted'  : 'счёт оплачен',
+  'declined'  : 'счёт отклолён',
+  'pending'   : 'оплатить'
+};
 
 router.get('/', function(req, res) {
   if (req.query.token && (req.query.token !== '')) {
@@ -99,6 +106,38 @@ router.post('/registration', function(req, res) {
   }
 });
 
+router.get('/licenses', function(req, res) {
+  if (req.session.user) {
+    var result = [];
+    var s = '', e = '', st= '';
+    Users.findOne({login:req.session.user}, function(err, u) {
+      Apps.findOne({insalesid:u.insalesid}, function(err, a) {
+        var iteration = function(row, callbackDone) {
+          if (row.start !== undefined) {
+            s = moment(row.start).format('DD-MM-YYYY');
+            e = moment(row.start).add('M', row.months).format('DD-MM-YYYY');
+          } else {
+            s = '', e = '';
+          }
+          if (row.status == 'pending') {
+            st = "<a class='uk-text-warning' href='http://" + a.url + "/admin/application_charges/" + row.insalesid + "'>" + status[row.status] + "</a>";
+          } else if (row.status == 'accepted') {
+            st = "<span class='uk-text-success'>" + status[row.status] + "</span>";
+          } else {
+            st = "<span class='uk-text-danger'>" + status[row.status] + "</span>";
+          }
+          result.push({operators: row.operators, months: row.months, amount: row.amount, status: st, start: s, end: e});
+          callbackDone();
+        };
+        async.eachSeries(u.licenses, iteration, function (err) {
+          res.contentType('application/json');
+          res.send(result);
+        });
+      });
+    });
+  }
+});
+
 router.post('/licenses', function(req, res) {
   if (req.session.user) {
     var id = hat();
@@ -159,7 +198,7 @@ router.get('/check/:invoiceid', function(req, res) {
           rest.get('http://' + process.env.insalesid + ':' + a.password + '@' + a.url + '/admin/application_charges/' + u.licenses[0].insalesid + '.xml').once('complete', function(response) {
             if (response['application-charge']) {
               console.log(response);
-              var iteration = function(row,callbackDone) {
+              var iteration = function(row, callbackDone) {
                 if (row.myid == req.param('invoiceid')) {
                   row.created_at = moment(response['application-charge']['created-at'][0]._).format('ddd, DD MMM YYYY HH:mm:ss ZZ');
                   row.updated_at = moment(response['application-charge']['updated-at'][0]._).format('ddd, DD MMM YYYY HH:mm:ss ZZ')
