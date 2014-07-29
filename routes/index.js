@@ -35,11 +35,10 @@ router.get('/', function(req, res) {
                   res.render('dashboard', { title: '' });
                 } else {
                   req.session.destroy(function() {
-                    console.log(req.session.user);
                     console.log('Пользователь отсутствует');
                     res.clearCookie('user', { path: '/' });
                     res.clearCookie('insalesid', { path: '/' });
-                    res.send('Пользователь отсутствует', 403);
+                    res.send('Пользователь отсутствует, нужно удалить и снова поставить приложение', 403);
                   });
                 }
               });
