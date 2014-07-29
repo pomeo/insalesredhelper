@@ -354,7 +354,7 @@ function addJSTag(req, res) {
                 console.log('Error: ' + JSON.stringify(o));
                 res.send('Произошла ошибка установки js кода', 500);
               } else {
-                console.log(o);
+                console.log('Код установлен');
                 a.install = true;
                 a.save(function (err) {
                   if (err) {
