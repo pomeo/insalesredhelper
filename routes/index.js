@@ -323,7 +323,7 @@ router.get('/uninstall', function(req, res) {
 module.exports = router;
 
 function addJSTag(req, res) {
-  var username = req.session.user || req.param('login').toLowerCase();
+  var username = req.param('login').toLowerCase() || req.session.user;
   Users.findOne({login:username}, function(err, u) {
     if (u) {
       u.insalesid = req.session.insalesid;
