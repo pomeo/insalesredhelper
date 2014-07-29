@@ -21,9 +21,9 @@ router.get('/', function(req, res) {
       }
     });
   } else {
-    console.log('Попытка входа магазина: ' + req.query.insales_id);
-    if ((req.query.insales_id && (req.query.insales_id !== '')) || req.session.insalesid) {
-      var insid = req.session.insalesid || req.query.insales_id;
+    var insid = req.session.insalesid || req.query.insales_id;
+    console.log('Попытка входа магазина: ' + insid);
+    if ((req.query.insales_id && (req.query.insales_id !== '')) || req.session.insalesid !== undefined) {
       Apps.findOne({insalesid:insid}, function(err, a) {
         if (a.enabled == true) {
           if (req.session.insalesid) {
