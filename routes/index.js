@@ -102,28 +102,119 @@ router.post('/registration', function(req, res) {
 
 router.post('/licenses', function(req, res) {
   if (req.session.user) {
+    var id = hat();
     Apps.findOne({insalesid:req.session.insalesid}, function(err, a) {
-      var invoice = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>'
-                  + '<application-charge>'
-                  + '<name>' +  + '</name>'
-                  + '<price type=\"decimal\">' +  + '</price>'
-                  + '<test type=\"boolean\">true</test>'
-                  + '<return-url>http://test3.sovechkin.com/check/12345</return-url>'
-                  + '</application-charge>';
-      rest.post('http://' + process.env.insalesid + ':' + a.password + '@' + a.url + '/admin/application_charges.xml', {
-        data: invoice,
-        headers: {'Content-Type': 'application/xml'}
-      }).once('complete', function(o) {
-        console.log(o);
-        res.send(200);
-      });
+      if ((req.param('months') == 1) || (req.param('months') == 3) || (req.param('months') == 6) || (req.param('months') == 12) || (req.param('months') == 24)) {
+        if ((req.param('operators') >= 0) && (req.param('operators') <= 100)) {
+          var s = (parseInt(req.param('months'), 10)*960)*parseInt(req.param('operators'), 10);
+          var invoice = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>'
+                      + '<application-charge>'
+                      + '<name>' + req.param('months') + ' месяцев и ' + req.param('operators') + ' операторов</name>'
+                      + '<price type=\"decimal\">' + s + '</price>'
+                      + '<test type=\"boolean\">true</test>'
+                      + '<return-url>http://test3.sovechkin.com/check/' + id + '</return-url>'
+                      + '</application-charge>';
+          Users.findOne({login:req.session.user}, function(err, u) {
+            if (u) {
+              rest.post('http://' + process.env.insalesid + ':' + a.password + '@' + a.url + '/admin/application_charges.xml', {
+                data: invoice,
+                headers: {'Content-Type': 'application/xml'}
+              }).once('complete', function(o) {
+                u.licenses.push({
+                  insalesid    : o['application-charge'].id[0]._,
+                  myid         : id,
+                  amount       : s,
+                  operators    : parseInt(req.param('operators'), 10),
+                  months       : parseInt(req.param('months'), 10),
+                  status       : 'pending',
+                  enabled      : true
+                });
+                u.save(function (err) {
+                  if (err) {
+                    res.send(err, 500);
+                  } else {
+                    res.send('http://' + a.url + '/admin/application_charges/' + o['application-charge'].id[0]._);
+                  }
+                });
+              });
+            } else {
+              res.send('Пользователь не найден', 500);
+            }
+          });
+        } else {
+          res.send('Превышение количества операторов', 403);
+        }
+      } else {
+        res.send('Нет такого количество месяцев', 403);
+      }
     });
   }
 });
 
 router.get('/check/:invoiceid', function(req, res) {
-  req.param('invoiceid');
-  res.send(200);
+  Users.findOne({'licenses.myid':req.param('invoiceid')}, function(err, u) {
+    if (u) {
+      console.log(u);
+      Apps.findOne({insalesid:u.insalesid}, function(err, a) {
+        if (a) {
+          rest.get('http://' + process.env.insalesid + ':' + a.password + '@' + a.url + '/admin/application_charges/' + u.licenses[0].insalesid + '.xml').once('complete', function(response) {
+            if (response['application-charge']) {
+              console.log(response);
+              var iteration = function(row,callbackDone) {
+                if (row.myid == req.param('invoiceid')) {
+                  row.created_at = moment(response['application-charge']['created-at'][0]._).format('ddd, DD MMM YYYY HH:mm:ss ZZ');
+                  row.updated_at = moment(response['application-charge']['updated-at'][0]._).format('ddd, DD MMM YYYY HH:mm:ss ZZ')
+                  row.status = response['application-charge'].status[0];
+                  if (response['application-charge'].status[0] == 'accepted') {
+                    rest.get('http://my.redhelper.ru/mercury/api/license/generate?key=' + process.env.redkey + '&months=' + row.months + '&operators=' + row.operators).once('complete', function(r) {
+                      console.log(JSON.stringify(r));
+                      if (r.guid) {
+                        row.guid = r.guid;
+                        rest.get('http://my.redhelper.ru/mercury/api/license/activate?key=' + process.env.redkey + '&name=' + u.login + '&guid=' + row.guid + '&start=' + moment().format('YYYY-MM-DD')).once('complete', function(c) {
+                          console.log(c);
+                          if (c.success) {
+                            row.start = moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ');
+                            callbackDone();
+                          } else {
+                            callbackDone();
+                          }
+                        });
+                      } else {
+                        console.log('Error: ' + JSON.stringify(r));
+                        res.send(response.error);
+                        callbackDone();
+                      }
+                    });
+                  } else {
+                    callbackDone();
+                  }
+                } else {
+                  callbackDone();
+                }
+              };
+              async.eachSeries(u.licenses, iteration, function (err) {
+                u.save(function (err) {
+                  if (err) {
+                    res.send(err, 500);
+                  } else {
+                    console.log('All done');
+                    res.send(200);
+                  }
+                });
+              });
+            } else {
+              console.log('Error: ' + JSON.stringify(response));
+              res.send(200);
+            }
+          });
+        } else {
+          res.send('Магазин отсутствует');
+        }
+      });
+    } else {
+      res.send('Счёт отсутствует');
+    }
+  });
 });
 
 router.get('/install', function(req, res) {
