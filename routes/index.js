@@ -9,6 +9,7 @@ var express    = require('express'),
     Schema     = mongoose.Schema,
     hat        = require('hat'),
     async      = require('async'),
+    Agenda     = require('agenda'),
     status     = {};
 
 status = {
