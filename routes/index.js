@@ -150,7 +150,7 @@ router.post('/licenses', function(req, res) {
                       + '<application-charge>'
                       + '<name>' + req.param('months') + ' месяцев и ' + req.param('operators') + ' операторов</name>'
                       + '<price type=\"decimal\">' + s + '</price>'
-                      + '<test type=\"boolean\">false</test>'
+                      + '<test type=\"boolean\">true</test>'
                       + '<return-url>http://test3.sovechkin.com/check/' + id + '</return-url>'
                       + '</application-charge>';
           Users.findOne({login:req.session.user}, function(err, u) {
