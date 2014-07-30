@@ -420,11 +420,22 @@ function addJSTag(req, res) {
           }
         });
       } else {
-        rest.get('http://my.redhelper.ru/mercury/api/client/register?key=' + process.env.redkey + '&name=' + req.param('login') + '&password=' + req.param('pass') + '&email=' + req.param('email') + '&contactfio=' + req.param('name') + '&contactphone=' + req.param('phone') + '&comment=distributor=InSales').once('complete', function(response) {
-          console.log(JSON.stringify(response));
-          if (response.error) {
-            res.send(response.error);
-          } else if (response.success) {
+        rest.post('http://redhelper.ru/my/register', {
+          data: {
+            login: req.param('login'),
+            password: req.param('pass'),
+            email: req.param('email'),
+            contactfio: req.param('name'),
+            contactphone: req.param('phone'),
+            comment: 'distributor=InSales',
+            locale: 'ru',
+            distributorId: ''
+          }
+        }).once('complete', function(response) {
+          console.log(response);
+          if ((response == 'exist') || (response == 'email incorrect')) {
+            res.send(response);
+          } else if (response == 'success') {
             var user = new Users({
               login      : username,
               insalesid  : req.session.insalesid,
