@@ -61,7 +61,7 @@ router.get('/', function(req, res) {
               if (err) {
                 res.send(err, 500);
               } else {
-                res.redirect('http://' + a.url + '/admin/applications/' + process.env.insalesid + '/login?token=' + id + '&login=http://test3.sovechkin.com');
+                res.redirect('http://' + a.url + '/admin/applications/' + process.env.insalesid + '/login?token=' + id + '&login=http://' + process.env.redurl);
               }
             });
           }
@@ -150,8 +150,8 @@ router.post('/licenses', function(req, res) {
                       + '<application-charge>'
                       + '<name>' + req.param('months') + ' месяцев и ' + req.param('operators') + ' операторов</name>'
                       + '<price type=\"decimal\">' + s + '</price>'
-                      + '<test type=\"boolean\">false</test>'
-                      + '<return-url>http://test3.sovechkin.com/check/' + id + '</return-url>'
+                      + '<test type=\"boolean\">true</test>'
+                      + '<return-url>http://' + process.env.redurl + '/check/' + id + '</return-url>'
                       + '</application-charge>';
           Users.findOne({login:req.session.user}, function(err, u) {
             if (u) {
