@@ -18,6 +18,7 @@ status = {
   'pending'   : 'оплатить'
 };
 
+// Главная страница приложения, проверяет сессии и откуда пришёл человек, чтобы либо показать ему сразу панель управления, либо отправить на регистрацию.
 router.get('/', function(req, res) {
   if (req.query.token && (req.query.token !== '')) {
     Apps.findOne({token:req.query.token}, function(err, a) {
@@ -107,6 +108,7 @@ router.post('/registration', function(req, res) {
   }
 });
 
+// Сюда приходит запрос при нахождении в панели управления приложением. Отвечает json'ом в котором список лицензий пользователя от которого приходит запрос(оплаченные или нет).
 router.get('/licenses', function(req, res) {
   if (req.session.user) {
     var result = [];
@@ -139,6 +141,7 @@ router.get('/licenses', function(req, res) {
   }
 });
 
+// Сюда приходит post запрос на создание счёта, здесь же дублируется калькулятор лицензий и цена считается ещё раз.
 router.post('/licenses', function(req, res) {
   if (req.session.user) {
     var id = hat();
@@ -190,6 +193,7 @@ router.post('/licenses', function(req, res) {
   }
 });
 
+// Сюда приходит запрос от insales, если пользователь оплатил счёт. Приложения проверяет это делая запрос в insales и если там отмечено оплачено, то генерит и активирует лицензию через api mercury
 router.get('/check/:invoiceid', function(req, res) {
   Users.findOne({'licenses.myid':req.param('invoiceid')}, function(err, u) {
     if (u) {
@@ -256,6 +260,7 @@ router.get('/check/:invoiceid', function(req, res) {
   });
 });
 
+// Сюда приходит запрос от insales на установку приложения
 router.get('/install', function(req, res) {
   if ((req.query.shop !== '') && (req.query.token !== '') && (req.query.insales_id !== '') && req.query.shop && req.query.token && req.query.insales_id) {
     Apps.findOne({insalesid:req.query.insales_id}, function(err, a) {
@@ -297,6 +302,7 @@ router.get('/install', function(req, res) {
   }
 });
 
+// Сюда приходит запрос на удаления приложения из insales
 router.get('/uninstall', function(req, res) {
   if ((req.query.shop !== '') && (req.query.token !== '') && (req.query.insales_id !== '') && req.query.shop && req.query.token && req.query.insales_id) {
     Apps.findOne({insalesid:req.query.insales_id}, function(err, a) {
@@ -322,6 +328,7 @@ router.get('/uninstall', function(req, res) {
 
 module.exports = router;
 
+// Основная функция, используется при регистрации или ввода существующего аккаунта. Создаёт пользователя в своей базе и размещает js код на сайте.
 function addJSTag(req, res) {
   var username = req.param('login').toLowerCase() || req.session.user;
   Users.findOne({login:username}, function(err, u) {
@@ -493,6 +500,8 @@ function addJSTag(req, res) {
 
 var agenda = new Agenda({db: { address: 'mongodb.fr1.server.sovechkin.com/redhelper'}});
 
+//Схемы коллекций(таблиц) монги
+
 mongoose.connect('mongodb://mongodb.fr1.server.sovechkin.com/redhelper');
 
 var LicensesSchema = new Schema();
@@ -538,6 +547,7 @@ AppsSchema.add({
 var Users = mongoose.model('Users', UsersSchema);
 var Apps = mongoose.model('Apps', AppsSchema);
 
+//это самый не понятный кусок, здесь происходит запуск в полночь по гринвичу. Проход по всей базе, и запрос состояния не оплаченных лицензий. Если вдруг insales отвечает что лицензия оплачена, то мы меняем её в своей базе на оплаченную, генерим и активируем её через api redhelper.
 agenda.define('check licenses', function(job, done) {
   Users.find({'licenses.status':'pending'}, {}, {sort: {'updated_at':-1}}, function(err, u) {
     var iteration = function(row, callbackDone) {
