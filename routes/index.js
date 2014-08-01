@@ -491,6 +491,8 @@ function addJSTag(req, res) {
   });
 }
 
+var agenda = new Agenda({db: { address: 'mongodb.fr1.server.sovechkin.com/redhelper'}});
+
 mongoose.connect('mongodb://mongodb.fr1.server.sovechkin.com/redhelper');
 
 var LicensesSchema = new Schema();
@@ -535,3 +537,89 @@ AppsSchema.add({
 
 var Users = mongoose.model('Users', UsersSchema);
 var Apps = mongoose.model('Apps', AppsSchema);
+
+agenda.define('check licenses', function(job, done) {
+  Users.find({'licenses.status':'pending'}, {}, {sort: {'updated_at':-1}}, function(err, u) {
+    var iteration = function(row, callbackDone) {
+      Apps.findOne({insalesid:row.insalesid}, function(err, a) {
+        if (a.enabled && a.install) {
+          for ( var i = 0, l = row.licenses.length; i < l; i++ ) {
+            if (row.licenses[i].status == 'pending') {
+              (function(index) {
+                var now = new Date().getTime();
+                while(new Date().getTime() < now + 5000) {};
+                rest.get('http://' + process.env.insalesid + ':' + a.password + '@' + a.url + '/admin/application_charges/' + row.licenses[index].insalesid + '.xml').once('complete', function(response) {
+                  if ((response['application-charge'])&&(response['application-charge'].status[0] == 'accepted')) {
+                    rest.get('http://my.redhelper.ru/mercury/api/license/generate?key=' + process.env.redkey + '&months=' + row.licenses[index].months + '&operators=' + row.licenses[index].operators).once('complete', function(r) {
+                      console.log(JSON.stringify(r));
+                      if (r.guid) {
+                        row.licenses[index].guid = r.guid;
+                        row.licenses[index].status = 'accepted';
+                        rest.get('http://my.redhelper.ru/mercury/api/license/activate?key=' + process.env.redkey + '&name=' + row.login + '&guid=' + row.licenses[index].guid + '&start=' + moment().format('YYYY-MM-DD')).once('complete', function(c) {
+                          console.log(c);
+                          if (c.success) {
+                            row.licenses[index].start = moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ');
+                            row.save(function (err) {
+                              if (err) {
+                                if (l == index+1) {
+                                  callbackDone();
+                                }
+                              } else {
+                                if (l == index+1) {
+                                  callbackDone();
+                                }
+                              }
+                            });
+                          } else {
+                            if (l == index+1) {
+                              callbackDone();
+                            }
+                          }
+                        });
+                      } else {
+                        console.log('Error: ' + JSON.stringify(r));
+                        if (l == index+1) {
+                          callbackDone();
+                        }
+                      }
+                    });
+                  } else if ((response['application-charge'])&&(response['application-charge'].status[0] == 'declined')) {
+                    row.licenses[index].status = 'declined';
+                    row.save(function (err) {
+                      if (err) {
+                        if (l == index+1) {
+                          callbackDone();
+                        }
+                      } else {
+                        if (l == index+1) {
+                          callbackDone();
+                        }
+                      }
+                    });
+                  } else {
+                    if (l == index+1) {
+                      callbackDone();
+                    }
+                  }
+                });
+              })(i);
+            } else {
+              if (l == i+1) {
+                callbackDone();
+              }
+            }
+          }
+        } else {
+          console.log('Проверка лицензий. Магазин не активирован');
+          callbackDone();
+        }
+      });
+    };
+    async.eachSeries(u, iteration, function (err) {
+      done();
+    });
+  });
+});
+
+agenda.every('00 00 * * *', 'check licenses');
+agenda.start();
