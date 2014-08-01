@@ -150,7 +150,7 @@ router.post('/licenses', function(req, res) {
                       + '<application-charge>'
                       + '<name>' + req.param('months') + ' месяцев и ' + req.param('operators') + ' операторов</name>'
                       + '<price type=\"decimal\">' + s + '</price>'
-                      + '<test type=\"boolean\">true</test>'
+                      + '<test type=\"boolean\">false</test>'
                       + '<return-url>http://' + process.env.redurl + '/check/' + id + '</return-url>'
                       + '</application-charge>';
           Users.findOne({login:req.session.user}, function(err, u) {
@@ -547,7 +547,7 @@ agenda.define('check licenses', function(job, done) {
             if (row.licenses[i].status == 'pending') {
               (function(index) {
                 var now = new Date().getTime();
-                while(new Date().getTime() < now + 5000) {};
+                while(new Date().getTime() < now + 1000) {};
                 rest.get('http://' + process.env.insalesid + ':' + a.password + '@' + a.url + '/admin/application_charges/' + row.licenses[index].insalesid + '.xml').once('complete', function(response) {
                   if ((response['application-charge'])&&(response['application-charge'].status[0] == 'accepted')) {
                     rest.get('http://my.redhelper.ru/mercury/api/license/generate?key=' + process.env.redkey + '&months=' + row.licenses[index].months + '&operators=' + row.licenses[index].operators).once('complete', function(r) {
