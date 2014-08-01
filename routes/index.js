@@ -476,7 +476,7 @@ function addJSTag(req, res) {
                           res.send(err, 500);
                         } else {
                           req.session.user = username;
-                          res.send(response.success);
+                          res.send(response);
                         }
                       });
                     }
