@@ -377,123 +377,54 @@ function addJSTag(req, res) {
         }
       });
     } else {
-      if (req.param('login') && !req.param('pass') && !req.param('email') && !req.param('name') && !req.param('phone')) {
-        var user = new Users({
-          login      : username,
-          insalesid  : req.session.insalesid,
-          created_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
-          updated_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
-          enabled    : true
-        });
-        user.save(function (err) {
-          if (err) {
-            res.send(err, 500);
-          } else {
-            Apps.findOne({insalesid:req.session.insalesid}, function(err, a) {
-              var xml = '(function() {'
-                      + 'var fileref = document.createElement(\"script\");'
-                      + 'fileref.setAttribute(\"type\",\"text/javascript\");'
-                      + 'fileref.id = \'rhlpscrtg\';'
-                      + 'fileref.charset=\'utf-8\';'
-                      + 'fileref.async = true;'
-                      + 'fileref.setAttribute(\"src\", \"https://web.redhelper.ru/service/main.js?c=' + username + '\");'
-                      + 'document.getElementsByTagName(\"head\")[0].appendChild(fileref);'
-                      + '})();';
-              var jstag = '<js-tag>'
-                        + '<type type="string">JsTag::TextTag</type>'
-                        + '<content>' + xml + '</content>'
-                        + '</js-tag>';
-              rest.post('http://' + process.env.insalesid + ':' + a.password + '@' + a.url + '/admin/js_tags.xml', {
-                data: jstag,
-                headers: {'Content-Type': 'application/xml'}
-              }).once('complete', function(o) {
-                if (o.errors) {
-                  console.log('Error: ' + JSON.stringify(o));
-                  res.send('Произошла ошибка установки js кода', 500);
-                } else {
-                  console.log(o);
-                  a.install = true;
-                  a.save(function (err) {
-                    if (err) {
-                      res.send(err, 500);
-                    } else {
-                      req.session.user = username;
-                      res.redirect('/');
-                    }
-                  });
-                }
-              });
-            });
-          }
-        });
-      } else {
-        rest.post('http://redhelper.ru/my/register', {
-          data: {
-            login: req.param('login'),
-            password: req.param('pass'),
-            email: req.param('email'),
-            contactfio: req.param('name'),
-            contactphone: req.param('phone'),
-            comment: 'distributor=InSales',
-            locale: 'ru',
-            distributorId: ''
-          }
-        }).once('complete', function(response) {
-          console.log(response);
-          if ((response == 'exist') || (response == 'email incorrect')) {
-            res.send(response);
-          } else if (response == 'success') {
-            var user = new Users({
-              login      : username,
-              insalesid  : req.session.insalesid,
-              created_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
-              updated_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
-              enabled    : true
-            });
-            user.save(function (err) {
-              if (err) {
-                res.send(err, 500);
+      var user = new Users({
+        login      : username,
+        insalesid  : req.session.insalesid,
+        created_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
+        updated_at : moment().format('ddd, DD MMM YYYY HH:mm:ss ZZ'),
+        enabled    : true
+      });
+      user.save(function (err) {
+        if (err) {
+          res.send(err, 500);
+        } else {
+          Apps.findOne({insalesid:req.session.insalesid}, function(err, a) {
+            var xml = '(function() {'
+                    + 'var fileref = document.createElement(\"script\");'
+                    + 'fileref.setAttribute(\"type\",\"text/javascript\");'
+                    + 'fileref.id = \'rhlpscrtg\';'
+                    + 'fileref.charset=\'utf-8\';'
+                    + 'fileref.async = true;'
+                    + 'fileref.setAttribute(\"src\", \"https://web.redhelper.ru/service/main.js?c=' + username + '\");'
+                    + 'document.getElementsByTagName(\"head\")[0].appendChild(fileref);'
+                    + '})();';
+            var jstag = '<js-tag>'
+                      + '<type type="string">JsTag::TextTag</type>'
+                      + '<content>' + xml + '</content>'
+                      + '</js-tag>';
+            rest.post('http://' + process.env.insalesid + ':' + a.password + '@' + a.url + '/admin/js_tags.xml', {
+              data: jstag,
+              headers: {'Content-Type': 'application/xml'}
+            }).once('complete', function(o) {
+              if (o.errors) {
+                console.log('Error: ' + JSON.stringify(o));
+                res.send('Произошла ошибка установки js кода', 500);
               } else {
-                Apps.findOne({insalesid:req.session.insalesid}, function(err, a) {
-                  var xml = '(function() {'
-                          + 'var fileref = document.createElement(\"script\");'
-                          + 'fileref.setAttribute(\"type\",\"text/javascript\");'
-                          + 'fileref.id = \'rhlpscrtg\';'
-                          + 'fileref.charset=\'utf-8\';'
-                          + 'fileref.async = true;'
-                          + 'fileref.setAttribute(\"src\", \"https://web.redhelper.ru/service/main.js?c=' + username + '\");'
-                          + 'document.getElementsByTagName(\"head\")[0].appendChild(fileref);'
-                          + '})();';
-                  var jstag = '<js-tag>'
-                            + '<type type="string">JsTag::TextTag</type>'
-                            + '<content>' + xml + '</content>'
-                            + '</js-tag>';
-                  rest.post('http://' + process.env.insalesid + ':' + a.password + '@' + a.url + '/admin/js_tags.xml', {
-                    data: jstag,
-                    headers: {'Content-Type': 'application/xml'}
-                  }).once('complete', function(o) {
-                    if (o.errors) {
-                      console.log('Error: ' + JSON.stringify(o));
-                      res.send('Произошла ошибка установки js кода', 500);
-                    } else {
-                      console.log(o);
-                      a.install = true;
-                      a.save(function (err) {
-                        if (err) {
-                          res.send(err, 500);
-                        } else {
-                          req.session.user = username;
-                          res.send(response);
-                        }
-                      });
-                    }
-                  });
+                console.log(o);
+                a.install = true;
+                a.save(function (err) {
+                  if (err) {
+                    res.send(err, 500);
+                  } else {
+                    req.session.user = username;
+                    res.redirect('/');
+                  }
                 });
               }
             });
-          }
-        });
-      }
+          });
+        }
+      });
     }
   });
 }
