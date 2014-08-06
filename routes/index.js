@@ -151,7 +151,7 @@ router.post('/licenses', function(req, res) {
           var s = (parseInt(req.param('months'), 10)*960)*parseInt(req.param('operators'), 10);
           var invoice = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>'
                       + '<application-charge>'
-                      + '<name>' + req.param('months') + ' ' + get_correct_str(req.param('months'), "месяц", "месяца", "месяцев") + ' и ' + req.param('operators') + ' ' + get_correct_str(req.param('operators'), "оператор", "оператора", "операторов") + '</name>'
+                      + '<name>' + get_correct_str(req.param('months'), "месяц", "месяца", "месяцев") + ' и ' + get_correct_str(req.param('operators'), "оператор", "оператора", "операторов") + '</name>'
                       + '<price type=\"decimal\">' + s + '</price>'
                       + '<test type=\"boolean\">false</test>'
                       + '<return-url>http://' + process.env.redurl + '/check/' + id + '</return-url>'
