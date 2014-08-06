@@ -4,7 +4,7 @@ block content
   div.uk-width-1-1.uk-height-1-1.uk-vertical-align.uk-text-center
     div.b-login.uk-container-center.uk-vertical-align-middle
       img.uk-display-block.uk-align-center(src="/img/logo.png")
-      form.uk-form.uk-form-stacked(action="/registration", method="post", id="reg")
+      form.uk-form.uk-form-stacked(action="http://redhelper.ru/my/register", method="post", id="reg")
         fieldset.uk-text-left(data-uk-margin)
           div.uk-form-row.b-reg-input
             label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small.uk-margin-bottom-remove(for="login") Придумайте свой уникальный логин. Логин может состоять только из латинских букв и цифр, сам логин должен быть не короче 3 символов
@@ -17,21 +17,24 @@ block content
               i.uk-icon-envelope
               input.uk-form-width-medium(type="text", name="email", placeholder="E-mail*")
           div.uk-form-row.b-reg-input.uk-margin-top-remove
-            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small.uk-margin-bottom-remove(for="pass") Придумайте пароль для подключения сервиса RedHelper. В целях безопасности пароль должен отличаться от пароля InSales
+            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small.uk-margin-bottom-remove(for="password") Придумайте пароль для подключения сервиса RedHelper. В целях безопасности пароль должен отличаться от пароля InSales
             div.uk-form-icon
               i.uk-icon-lock
-              input.uk-form-width-medium(type="password", name="pass", placeholder="Пароль*")
+              input.uk-form-width-medium(type="password", name="password", placeholder="Пароль*")
           div.uk-form-row.b-reg-input.uk-margin-top-remove
-            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small.uk-margin-bottom-remove(for="name") Введите Ваше ФИО по-русски
+            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small.uk-margin-bottom-remove(for="contactfio") Введите Ваше ФИО по-русски
             div.uk-form-icon
               i.uk-icon-user
-              input.uk-form-width-medium(type="text", name="name", placeholder="Имя*")
+              input.uk-form-width-medium(type="text", name="contactfio", placeholder="Имя*")
           div.uk-form-row.b-reg-input.uk-margin-top-remove
-            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small.uk-margin-bottom-remove(for="phone") Ваш контактный телефон
+            label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small.uk-margin-bottom-remove(for="contactphone") Ваш контактный телефон
             div.uk-form-icon
               i.uk-icon-phone
-              input.uk-form-width-medium(type="text", name="phone", placeholder="Телефон*")
+              input.uk-form-width-medium(type="text", name="contactphone", placeholder="Телефон*")
           div.uk-form-row.uk-margin-top-remove
+            input.uk-hidden(type="text", name="comment", placeholder="distributor=InSales")
+            input.uk-hidden(type="text", name="locale", placeholder="ru")
+            input.uk-hidden(type="text", name="distributorId", placeholder="InSalesdist")
             label.uk-form-label.uk-text-muted.uk-text-italics.uk-text-small.uk-margin-bottom-remove(for="submit") * - поля обязательные для заполнения
             button.uk-button.uk-margin-small-right Зарегистрироваться
       script
@@ -51,13 +54,13 @@ block content
         |       required: true,
         |       email: true
         |     },
-        |     pass: {
+        |     password: {
         |       required: true
         |     },
-        |     name: {
+        |     contactfio: {
         |       required: true
         |     },
-        |     phone: {
+        |     contactphone: {
         |       required: true,
         |       number: true
         |     }
@@ -71,13 +74,13 @@ block content
         |       required: "",
         |       email: "Введите правильный e-mail"
         |     },
-        |     pass: {
+        |     password: {
         |       required: ""
         |     },
-        |     name: {
+        |     contactfio: {
         |       required: ""
         |     },
-        |     phone: {
+        |     contactphone: {
         |       required: "",
         |       number: "Только цифры"
         |     }
@@ -87,13 +90,25 @@ block content
         |   },
         |   submitHandler: function(form) {
         |     $(form).ajaxSubmit({
+        |       xhrFields: {
+        |         withCredentials: true
+        |       },
+        |       crossDomain: true,
         |       success: function (response) {
         |         if (response == 'exist') {
         |           $("<label id=\"login-error\" class=\"uk-form-danger uk-text-italics\" for=\"login\" style=\"display: inline;\">Внимание! Выбранный Вами логин уже занят. Подберите другое имя.</label>").insertAfter('#flogin').next('div');
         |         } else if (response == 'email incorrect') {
         |           $("<label id=\"login-error\" class=\"uk-form-danger uk-text-italics\" for=\"login\" style=\"display: inline;\">Указанной Вами почты не существует. Исправьте адрес электронной почты и попробуйте еще раз.</label>").insertAfter('#femail').next('div');
         |         } else if (response == 'success') {
-        |           window.location.href = "/";
+        |           $.ajax({
+        |             url: '/registration',
+        |             type: 'post',
+        |             data: {
+        |               login: $("input[name=login]").val()
+        |             }
+        |           }).done(function() {
+        |             window.location.href = "/";
+        |           });
         |         } else {
         |           $("<div class=\"uk-alert uk-alert-danger\" data-uk-alert><a class=\"uk-alert-close uk-close\" href=\"\"></a><p>Произошла ошибка</p></div>").insertBefore('#reg');
         |         }
