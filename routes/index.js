@@ -151,7 +151,7 @@ router.post('/licenses', function(req, res) {
           var s = (parseInt(req.param('months'), 10)*960)*parseInt(req.param('operators'), 10);
           var invoice = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>'
                       + '<application-charge>'
-                      + '<name>' + req.param('months') + ' месяцев и ' + req.param('operators') + ' операторов</name>'
+                      + '<name>' + req.param('months') + ' ' + get_correct_str(req.param('months'), "месяц", "месяца", "месяцев") + ' и ' + req.param('operators') + ' ' + get_correct_str(req.param('operators'), "оператор", "оператора", "операторов") + '</name>'
                       + '<price type=\"decimal\">' + s + '</price>'
                       + '<test type=\"boolean\">false</test>'
                       + '<return-url>http://' + process.env.redurl + '/check/' + id + '</return-url>'
@@ -427,6 +427,17 @@ function addJSTag(req, res) {
       });
     }
   });
+}
+
+function get_correct_str(num, str1, str2, str3) {
+    var val = num % 100;
+    if (val > 10 && val < 20) return num +' '+ str3;
+    else {
+        val = num % 10;
+        if (val == 1) return num +' '+ str1;
+        else if (val > 1 && val < 5) return num +' '+ str2;
+        else return num +' '+ str3;
+    }
 }
 
 var agenda = new Agenda({db: { address: 'mongodb.fr1.server.sovechkin.com/redhelper'}});
